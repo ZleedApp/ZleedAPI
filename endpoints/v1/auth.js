@@ -1,5 +1,3 @@
-const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 module.exports = {
   endpointName: 'auth',
   addEndpoint: (expressApp, mySQLPool) => {
@@ -14,12 +12,12 @@ module.exports = {
 
       if(!checkRequestBody(requestBody, 'login')) checkRequestBody(requestBody, 'login');
 
-      const [ err, rows ] = await mySQLPool.query("SELECT * FROM users WHERE email = ? ", [ requestBody.email ]);
+      const [ rows ] = await mySQLPool.query("SELECT * FROM users WHERE email = ?", [ requestBody.email ]);
 
       if(rows.length === 1) {
         const passwordMatch = await bcrypt.compare(requestBody.password, rows[0].password);
 
-        const jwtToken      = jwt.sign({ uuid: userUUID, username: requestBody.username, email: requestBody.email }, process.env.JWT_SECRET, { algorithm: 'HS512', expiresIn: '30d' });
+        const jwtToken      = jwt.sign({ uuid: rows[0].uuid, username: rows[0].username, email: rows[0].email }, process.env.JWT_SECRET, { algorithm: 'HS512', expiresIn: '30d' });
         const expiryDate    = new Date().getDate() + 30;
 
         if(passwordMatch) {
