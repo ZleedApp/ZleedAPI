@@ -1,0 +1,26 @@
+{
+  "name": "zleedapi",
+  "version": "1.0.0",
+  "description": "API for Zleed.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZleedApp/ZleedAPI.git"
+  },
+  "author": "TheClashFruit",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ZleedApp/ZleedAPI/issues"
+  },
+  "homepage": "https://github.com/ZleedApp/ZleedAPI#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "mysql2": "^2.3.3"
+  }
+}
