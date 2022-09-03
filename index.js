@@ -24,6 +24,12 @@ const mySQLPool = mysql.createPool({
   queueLimit: 0
 });
 
+expressApp.all('*', async (req, res, next) => {
+  console.log(`[Zleed] API  : New request to '${req.path}'.`);
+
+  next();
+});
+
 const endpointFiles = fs.readdirSync('./endpoints/v1').filter(file => file.endsWith('.js'));
 
 endpointFiles.forEach(endpointFile => {
@@ -35,8 +41,6 @@ endpointFiles.forEach(endpointFile => {
 });
 
 expressApp.get('/', async (req, res) => {
-  console.log(`[Zleed] API  : New request to '${req.path}'.`);
-
   res.json({
     status: 1,
     message: 'Hello World',
@@ -49,8 +53,6 @@ expressApp.get('/', async (req, res) => {
 });
 
 expressApp.get('/status', async (req, res) => {
-  console.log(`[Zleed] API  : New request to '${req.path}'.`);
-
   res.status(200);
   res.send('OK');
 });
