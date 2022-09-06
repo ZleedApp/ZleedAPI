@@ -7,6 +7,16 @@ module.exports = {
     const bcrypt = require('bcrypt');
     const crypto = require('crypto');
 
+    const UrlSafeString = require('url-safe-string');
+
+    const stringTrimmer = new UrlSafeString({
+      maxLen:             50,
+      lowercaseOnly:      true,
+      regexRemovePattern: /((?!([a-z0-9])).)/gi,
+      joinString:         '_',
+      trimWhitespace:     true
+    });
+
     expressApp.post('/v1/auth/login', async (req, res) => {
       const requestBody = req.body;
 
@@ -67,7 +77,7 @@ module.exports = {
         "INSERT INTO users (uuid, username, display_name, stream_token, stream_title, stream_game, stream_language, following_data, is_live, is_admin, email, password, creation_date) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE NOT EXISTS (SELECT username, email FROM users WHERE username = ? OR email = ?)",
         [
           userUUID,
-          requestBody.username,
+          stringTrimmer.generate(requestBody.username),
           requestBody.username,
           streamKey,
           "Welcome to Zleed!",
