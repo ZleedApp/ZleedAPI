@@ -1,5 +1,5 @@
 module.exports = {
-  endpointName: 'explore',
+  endpointName: 'Explore',
   addEndpoint: (expressApp, mySQLPool) => {
     expressApp.get('/v1/explore/live', async (req, res) => {
       const [ rows ] = await mySQLPool.query("SELECT * FROM users WHERE is_live = 1");

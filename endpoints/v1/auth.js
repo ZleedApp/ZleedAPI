@@ -1,5 +1,5 @@
 module.exports = {
-  endpointName: 'auth',
+  endpointName: 'Auth',
   addEndpoint: (expressApp, mySQLPool) => {
     const { v4: uuidv4 } = require('uuid');
 

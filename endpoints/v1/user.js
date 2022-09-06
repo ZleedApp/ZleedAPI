@@ -1,5 +1,5 @@
 module.exports = {
-  endpointName: 'user',
+  endpointName: 'User',
   addEndpoint: (expressApp, mySQLPool) => {
     const jwt = require('jsonwebtoken');
 
