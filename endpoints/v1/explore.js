@@ -29,6 +29,15 @@ module.exports = {
           messageCode: 'LIVE_USERS_FOUND',
           data: liveUsers
         });
+      } else {
+        res.status(404);
+
+        res.json({
+          status: 1,
+          message: 'No users are live right now.',
+          messageCode: 'NO_LIVE_USERS_FOUND',
+          data: null
+        });
       }
     });
 
@@ -56,9 +65,18 @@ module.exports = {
 
         res.json({
           status: 1,
-          message: 'Live users found.',
-          messageCode: 'LIVE_USERS_FOUND',
+          message: 'All users found.',
+          messageCode: 'ALL_USERS_FOUND',
           data: liveUsers
+        });
+      } else {
+        res.status(404);
+
+        res.json({
+          status: 1,
+          message: 'No users found.',
+          messageCode: 'NO_USERS_FOUND',
+          data: null
         });
       }
     });
