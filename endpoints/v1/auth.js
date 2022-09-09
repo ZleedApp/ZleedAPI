@@ -28,7 +28,9 @@ module.exports = {
         const passwordMatch = await bcrypt.compare(requestBody.password, rows[0].password);
 
         const jwtToken      = jwt.sign({ uuid: rows[0].uuid, username: rows[0].username, email: rows[0].email }, process.env.JWT_SECRET, { algorithm: 'HS512', expiresIn: '30d' });
-        const expiryDate    = new Date().getDate() + 30;
+        const expiryDate    = new Date();
+
+        expiryDate.setDate(expiryDate.getDate() + 30);
 
         if(passwordMatch) {
           res.json({
@@ -71,7 +73,9 @@ module.exports = {
       const streamKey     = crypto.randomBytes(20).toString('hex');
 
       const jwtToken      = jwt.sign({ uuid: userUUID, username: requestBody.username, email: requestBody.email }, process.env.JWT_SECRET, { algorithm: 'HS512', expiresIn: '30d' });
-      const expiryDate    = new Date().getDate() + 30;
+      const expiryDate    = new Date();
+
+      expiryDate.setDate(expiryDate.getDate() + 30);
 
       const [ err, rows ] = await mySQLPool.query(
         "INSERT INTO users (uuid, username, display_name, stream_token, stream_title, stream_game, stream_language, following_data, is_live, is_admin, email, password, creation_date) SELECT ?,?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE NOT EXISTS (SELECT username, email FROM users WHERE username = ? OR email = ?)",
