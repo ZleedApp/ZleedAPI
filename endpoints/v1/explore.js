@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 module.exports = {
   endpointName: 'Explore',
   addEndpoint: (expressApp, mySQLPool) => {
@@ -78,6 +79,57 @@ module.exports = {
           messageCode: 'NO_USERS_FOUND',
           data: null
         });
+      }
+    });
+
+    expressApp.get('/v1/explore/following', async (req, res) => {
+      const jwtToken   = req.headers.authorization.split(' ')[1];
+      const jwtDecoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+
+      const [ rows ] = await mySQLPool.query("SELECT * FROM users WHERE uuid = ?", [ jwtDecoded.uuid ]);
+
+      if(rows.length === 1) {
+        const followingData = JSON.parse(rows[0].following_data);
+
+        if(followingData.length > 0) {
+          let followingUsers = [];
+
+          for (const user of followingData) {
+            const [ rows ] = await mySQLPool.query("SELECT * FROM users WHERE uuid = ?", [ user ]);
+
+            if(rows.length === 1) {
+              followingUsers.push({
+                userId: rows[0].uuid,
+                userName: rows[0].username,
+                userDisplayName: rows[0].display_name,
+                userCreated: rows[0].creation_date,
+                streamData: {
+                  streamTitle: rows[0].stream_title,
+                  streamGame: rows[0].stream_game,
+                  streamLanguage: rows[0].stream_language
+                },
+                isLive: rows[0].is_live,
+                isAdmin: rows[0].is_admin
+              });
+            }
+          }
+
+          res.json({
+            status: 1,
+            message: 'Following users found.',
+            messageCode: 'FOLLOWING_USERS_FOUND',
+            data: followingUsers
+          });
+        } else {
+          res.status(404);
+
+          res.json({
+            status: 1,
+            message: 'No users are being followed.',
+            messageCode: 'NO_FOLLOWING_USERS_FOUND',
+            data: null
+          });
+        }
       }
     });
   }

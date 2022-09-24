@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 module.exports = {
   endpointName: 'User',
   addEndpoint: (expressApp, mySQLPool) => {
@@ -63,6 +64,53 @@ module.exports = {
             isAdmin: rows[0].is_admin
           }
         });
+      } else {
+        res.json({
+          status: 0,
+          message: 'User not found.',
+          messageCode: 'USER_NOT_FOUND',
+          data: null
+        });
+      }
+    });
+
+    expressApp.post('/v1/user/:userName/follow', async (req, res) => {
+      const jwtToken   = req.headers.authorization.split(' ')[1];
+      const jwtDecoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+
+      let [ rows ] = await mySQLPool.query("SELECT * FROM users WHERE uuid = ?", [ jwtDecoded.uuid ]);
+      let rowsUser = rows;
+
+      if(rowsUser.length === 1) {
+        let followingData = JSON.parse(rowsUser[0].following_data);
+
+        let [ rows ] = await mySQLPool.query("SELECT * FROM users WHERE username = ?", [ req.params.userName ]);
+
+        if(rows.length === 1) {
+          if(followingData.includes(rows[0].uuid)) {
+            const newFollowingData = followingData.filter(data => data !== rows[0].uuid);
+
+            await mySQLPool.query("UPDATE users SET following_data = ? WHERE uuid = ?", [ JSON.stringify(newFollowingData), jwtDecoded.uuid ]);
+
+            res.json({
+              status: 1,
+              message: 'You are no longer following this user.',
+              messageCode: 'UN_FOLLOWING_USER',
+              data: null
+            });
+          } else {
+            followingData.push(rows[0].uuid);
+
+            await mySQLPool.query("UPDATE users SET following_data = ? WHERE uuid = ?", [ JSON.stringify(followingData), jwtDecoded.uuid ]);
+
+            res.json({
+              status: 1,
+              message: 'You are now following this user.',
+              messageCode: 'FOLLOWING_USER',
+              data: null
+            });
+          }
+        }
       } else {
         res.json({
           status: 0,
